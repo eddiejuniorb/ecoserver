@@ -31,55 +31,17 @@ CREATE TABLE `Product` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `options` (
-    `id` CHAR(36) NOT NULL,
-    `name` VARCHAR(191) NOT NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `optionvalues` (
-    `id` CHAR(36) NOT NULL,
-    `option_id` VARCHAR(191) NOT NULL,
-    `value` VARCHAR(191) NOT NULL,
-    `code` VARCHAR(191) NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `variants` (
     `id` CHAR(36) NOT NULL,
     `image` VARCHAR(191) NULL,
-    `discount` INTEGER NULL DEFAULT 0,
-    `SKU` VARCHAR(191) NULL,
+    `color` VARCHAR(191) NULL,
+    `size` VARCHAR(191) NULL,
+    `material` VARCHAR(191) NULL,
+    `type` VARCHAR(191) NULL,
     `price` DOUBLE NOT NULL,
     `stock` INTEGER NOT NULL,
     `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `productId` CHAR(36) NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `bigsales` (
-    `id` CHAR(36) NOT NULL,
-    `title` VARCHAR(191) NOT NULL,
-    `subtitle` VARCHAR(191) NULL,
-    `btn_name` VARCHAR(191) NOT NULL,
-    `target_link` VARCHAR(191) NOT NULL,
-    `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `uat` DATETIME(3) NOT NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `variantoption` (
-    `id` CHAR(36) NOT NULL,
-    `variant_id` VARCHAR(191) NOT NULL,
-    `option_id` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -133,21 +95,36 @@ CREATE TABLE `User` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `user_coupons` (
+    `id` CHAR(36) NOT NULL,
+    `user_id` VARCHAR(191) NOT NULL,
+    `couponId` VARCHAR(191) NOT NULL,
+    `applied_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `status` ENUM('used', 'applied') NOT NULL DEFAULT 'applied',
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `Order` (
     `id` CHAR(36) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
-    `totalPrice` DECIMAL(10, 0) NOT NULL,
-    `status` ENUM('pending', 'processing', 'cancelled', 'delivered', 'shipped') NOT NULL DEFAULT 'pending',
+    `total` DECIMAL(10, 0) NOT NULL,
+    `status` ENUM('pending', 'processing', 'cancelled', 'delivered', 'out_for_delivery', 'shipped') NOT NULL DEFAULT 'pending',
+    `payment_status` ENUM('unpaid', 'paid') NOT NULL DEFAULT 'unpaid',
+    `payment_mode` ENUM('cod', 'paystack') NOT NULL,
+    `coupon_id` VARCHAR(191) NULL,
     `orderNumber` INTEGER NOT NULL DEFAULT 0,
     `note` VARCHAR(191) NULL,
+    `delivery_type` ENUM('ship', 'pickup') NOT NULL DEFAULT 'ship',
     `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `uat` DATETIME(3) NOT NULL,
     `customise_total` DOUBLE NOT NULL DEFAULT 0.00,
     `shipping` DOUBLE NOT NULL DEFAULT 0.00,
     `discount` DOUBLE NOT NULL DEFAULT 0.00,
-    `address_id` VARCHAR(191) NOT NULL,
+    `shippindAddress` JSON NULL,
+    `our_shopId` VARCHAR(191) NULL DEFAULT '',
 
-    UNIQUE INDEX `Order_userId_key`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -157,7 +134,7 @@ CREATE TABLE `address` (
     `firstname` VARCHAR(191) NOT NULL,
     `lastname` VARCHAR(191) NULL,
     `company` VARCHAR(191) NULL,
-    `AddressOne` VARCHAR(191) NULL,
+    `AddressOne` VARCHAR(191) NOT NULL,
     `AdressTwo` VARCHAR(191) NULL,
     `user_id` VARCHAR(191) NOT NULL,
     `city` VARCHAR(191) NOT NULL,
@@ -175,6 +152,8 @@ CREATE TABLE `OrderItems` (
     `productId` VARCHAR(191) NOT NULL,
     `quantity` INTEGER NOT NULL,
     `price` DECIMAL(10, 0) NOT NULL,
+    `customisation` DOUBLE NULL DEFAULT 0.00,
+    `discount` DOUBLE NULL DEFAULT 0.00,
     `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `uat` DATETIME(3) NOT NULL,
 
@@ -184,8 +163,6 @@ CREATE TABLE `OrderItems` (
 -- CreateTable
 CREATE TABLE `Cart` (
     `id` CHAR(36) NOT NULL,
-    `sessionId` VARCHAR(191) NULL,
-    `userId` VARCHAR(191) NULL,
     `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
@@ -202,6 +179,7 @@ CREATE TABLE `CartItems` (
     `customise` BOOLEAN NOT NULL,
     `cartId` VARCHAR(191) NULL,
     `quantity` INTEGER NOT NULL,
+    `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     UNIQUE INDEX `CartItems_productId_customise_variant_id_key`(`productId`, `customise`, `variant_id`),
     PRIMARY KEY (`id`)
@@ -213,22 +191,140 @@ CREATE TABLE `banner` (
     `image` VARCHAR(191) NOT NULL,
     `title` VARCHAR(191) NOT NULL,
     `sub_title` VARCHAR(191) NOT NULL,
-    `button_name` VARCHAR(191) NOT NULL,
-    `button_link` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NOT NULL,
+    `link_name` VARCHAR(191) NOT NULL,
+    `link_url` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Payments` (
+CREATE TABLE `on_sales` (
     `id` CHAR(36) NOT NULL,
-    `orderId` VARCHAR(191) NOT NULL,
-    `type` ENUM('card', 'pickup', 'momo', 'ondelivery') NOT NULL,
-    `amount` DECIMAL(10, 0) NOT NULL,
-    `paid` BOOLEAN NOT NULL DEFAULT false,
+    `image` VARCHAR(191) NOT NULL,
+    `sub_title` VARCHAR(191) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NOT NULL,
+    `link_name` VARCHAR(191) NOT NULL,
+    `link_url` VARCHAR(191) NOT NULL,
+    `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `uat` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `smallHeader` (
+    `id` CHAR(36) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
+    `link_name` VARCHAR(191) NOT NULL,
+    `link_url` VARCHAR(191) NOT NULL,
+    `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `uat` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `seo` (
+    `id` CHAR(36) NOT NULL,
+    `favicon` VARCHAR(191) NOT NULL,
+    `meta_title` VARCHAR(191) NOT NULL,
+    `meta_description` VARCHAR(191) NOT NULL,
+    `meta_url` VARCHAR(191) NOT NULL,
+    `meta_keywords` VARCHAR(191) NOT NULL,
+    `meta_image` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `faqs` (
+    `id` CHAR(36) NOT NULL,
+    `question` VARCHAR(191) NOT NULL,
+    `answer` VARCHAR(191) NOT NULL,
     `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
-    UNIQUE INDEX `Payments_orderId_key`(`orderId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `updateInfo` (
+    `id` CHAR(36) NOT NULL,
+    `message` VARCHAR(191) NOT NULL,
+    `enabled` BOOLEAN NOT NULL DEFAULT false,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `promotional` (
+    `id` CHAR(36) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
+    `image` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NOT NULL,
+    `link_name` VARCHAR(191) NOT NULL,
+    `link_url` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `shipping_cost` (
+    `id` CHAR(36) NOT NULL,
+    `area_name` VARCHAR(191) NOT NULL,
+    `cost` DOUBLE NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `subscribers` (
+    `id` CHAR(36) NOT NULL,
+    `email` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `our_shop` (
+    `id` CHAR(36) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `image` VARCHAR(191) NOT NULL,
+    `address` VARCHAR(191) NOT NULL,
+    `telephone` VARCHAR(191) NOT NULL,
+    `email` VARCHAR(191) NULL,
+    `time_avalable1` VARCHAR(191) NOT NULL,
+    `time_avalable2` VARCHAR(191) NULL,
+    `google_address_link` VARCHAR(191) NOT NULL,
+    `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `uat` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `termCondition` (
+    `id` CHAR(36) NOT NULL,
+    `content` LONGTEXT NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `storeSetting` (
+    `id` CHAR(36) NOT NULL,
+    `cash_on_delivery` BOOLEAN NOT NULL DEFAULT true,
+    `paystack` BOOLEAN NOT NULL DEFAULT true,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `privacyPolicy` (
+    `id` CHAR(36) NOT NULL,
+    `content` LONGTEXT NOT NULL,
+
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -241,6 +337,8 @@ CREATE TABLE `staffs` (
     `password` VARCHAR(191) NOT NULL,
     `display_picture` VARCHAR(191) NOT NULL,
     `role` ENUM('admin', 'cashier', 'operator') NOT NULL DEFAULT 'cashier',
+    `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `uat` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `staffs_email_key`(`email`),
     PRIMARY KEY (`id`)
@@ -250,16 +348,7 @@ CREATE TABLE `staffs` (
 ALTER TABLE `Product` ADD CONSTRAINT `Product_category_id_fkey` FOREIGN KEY (`category_id`) REFERENCES `Category`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `optionvalues` ADD CONSTRAINT `optionvalues_option_id_fkey` FOREIGN KEY (`option_id`) REFERENCES `options`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `variants` ADD CONSTRAINT `variants_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `variantoption` ADD CONSTRAINT `variantoption_variant_id_fkey` FOREIGN KEY (`variant_id`) REFERENCES `variants`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `variantoption` ADD CONSTRAINT `variantoption_option_id_fkey` FOREIGN KEY (`option_id`) REFERENCES `optionvalues`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `bundleProducts` ADD CONSTRAINT `bundleProducts_product_id_fkey` FOREIGN KEY (`product_id`) REFERENCES `Product`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -268,22 +357,28 @@ ALTER TABLE `bundleProducts` ADD CONSTRAINT `bundleProducts_product_id_fkey` FOR
 ALTER TABLE `bundleProducts` ADD CONSTRAINT `bundleProducts_bundlePackage_id_fkey` FOREIGN KEY (`bundlePackage_id`) REFERENCES `bundlePackage`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Order` ADD CONSTRAINT `Order_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `user_coupons` ADD CONSTRAINT `user_coupons_couponId_fkey` FOREIGN KEY (`couponId`) REFERENCES `coupon`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Order` ADD CONSTRAINT `Order_address_id_fkey` FOREIGN KEY (`address_id`) REFERENCES `address`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `user_coupons` ADD CONSTRAINT `user_coupons_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Order` ADD CONSTRAINT `Order_coupon_id_fkey` FOREIGN KEY (`coupon_id`) REFERENCES `coupon`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Order` ADD CONSTRAINT `Order_our_shopId_fkey` FOREIGN KEY (`our_shopId`) REFERENCES `our_shop`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Order` ADD CONSTRAINT `Order_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `address` ADD CONSTRAINT `address_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `OrderItems` ADD CONSTRAINT `OrderItems_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `OrderItems` ADD CONSTRAINT `OrderItems_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `OrderItems` ADD CONSTRAINT `OrderItems_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Cart` ADD CONSTRAINT `Cart_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `CartItems` ADD CONSTRAINT `CartItems_variant_id_fkey` FOREIGN KEY (`variant_id`) REFERENCES `variants`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -293,6 +388,3 @@ ALTER TABLE `CartItems` ADD CONSTRAINT `CartItems_productId_fkey` FOREIGN KEY (`
 
 -- AddForeignKey
 ALTER TABLE `CartItems` ADD CONSTRAINT `CartItems_cartId_fkey` FOREIGN KEY (`cartId`) REFERENCES `Cart`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Payments` ADD CONSTRAINT `Payments_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `Order`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
