@@ -11,6 +11,7 @@ const { shopRoute } = require('../routes/client/shopRoute');
 const { orderRoute } = require('../routes/client/orderRoute');
 const { utilityRoute } = require('../routes/client/utility');
 const { contactRoute } = require('../routes/client/contact');
+const { v4: uuid } = require('uuid');
 
 
 clientApiGateWay.use((req, res, next) => {

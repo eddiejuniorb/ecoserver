@@ -16,7 +16,6 @@ const cluster = require('cluster');
 const os = require('os')
 const { sendEmail } = require('./services/mail');
 const { prisma } = require('./prismaClient');
-const { v4: uuid } = require('uuid');
 const myEmitter = require('./services/eventEmitter');
 const mailSuccesfulRegistration = require('./mail/mailRegistration');
 
