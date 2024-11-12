@@ -1,6 +1,6 @@
 const productClientRoute = require('express').Router();
 const { asyncError } = require('../../libs/errors/asyncError');
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 const { apiBadRequestError } = require('../../libs/errors/appError');
 
 // Get Single Product
@@ -42,15 +42,7 @@ productClientRoute.get('/:slug/single', asyncError(async (req, res) => {
 productClientRoute.get('/new', asyncError(async (req, res) => {
     const products = await prisma.product.findMany({
         take: 8, orderBy: { iat: "desc" },
-        select: {
-            name: true, id: true, customable: true, discount: true, slug: true, base_price: true, images: true, stock: true, variants: {
-                select: {
-                    id: true,
-                    price: true,
-                    stock: true,
-                },
-            }
-        },
+        include: { variants: true }
     })
 
 
@@ -70,15 +62,7 @@ productClientRoute.get('/popular', asyncError(async (req, res) => {
             views: 'desc'
         },
         take: 8,
-        select: {
-            name: true, id: true, customable: true, discount: true, slug: true, base_price: true, images: true, stock: true, variants: {
-                select: {
-                    id: true,
-                    price: true,
-                    stock: true,
-                },
-            }
-        },
+        include: { variants: true }
     })
 
 
@@ -91,9 +75,5 @@ productClientRoute.get('/popular', asyncError(async (req, res) => {
 
 }))
 
-// all colors
-productClientRoute.get('/colors/all', asyncError(async (req, res) => {
-    res.sendStatus(200)
-}))
 
 module.exports = { productClientRoute }

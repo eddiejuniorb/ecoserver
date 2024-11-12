@@ -94,7 +94,6 @@ model User {
   ban          Boolean        @default(false)
   orders       Order[]
   iat          DateTime       @default(now())
-  Cart         Cart[]
   address      address[]
   user_coupons user_coupons[]
 }
@@ -130,7 +129,7 @@ model Order {
   shipping        Float          @default(0.00)
   discount        Float          @default(0.00)
   shippindAddress Json?
-  our_shopId      String?        @db.Char(36)
+  our_shopId      String?        @default("")
 }
 
 model address {
@@ -163,12 +162,9 @@ model OrderItems {
 }
 
 model Cart {
-  id        String      @id @default(uuid()) @db.Char(36)
-  sessionId String?
-  userId    String?
-  user      User?       @relation(fields: [userId], references: [id])
-  items     CartItems[]
-  iat       DateTime    @default(now())
+  id    String      @id @default(uuid()) @db.Char(36)
+  items CartItems[]
+  iat   DateTime    @default(now())
 }
 
 model CartItems {

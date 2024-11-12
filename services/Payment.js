@@ -1,7 +1,7 @@
 const request = require("request")
 
 const { paystack } = require("../libs/Payment/Paystack")
-const { prisma } = require("../prisma")
+const { prisma } = require("../prismaClient")
 
 const { initializePayment, verifyPayment } = paystack(request)
 
@@ -51,18 +51,13 @@ class PaymentServices {
                     const { status, metadata } = response?.data;
 
                     if (status) {
-                        const orderToConfirm = metadata?.order;
-                        const cartId = metadata?.cartId
-                        const cartItems = metadata?.cart_items
-                        const addOrder = await prisma.order.create({ data: orderToConfirm })
+                        const orderID = metadata?.order_id;
+                        await prisma.order.update({
+                            where: { id: orderID },
+                            data: { payment_status: 'paid' }
+                        })
 
-                        if (addOrder) {
-                            if (await prisma.cart.delete({ where: { id: cartId } })) {
-                                await createOrderItem(addOrder?.id, cartItems)
-                            }
-
-                        }
-
+                        return resolve(response)
                     }
                 })
 
@@ -76,23 +71,5 @@ class PaymentServices {
 
 }
 
-
-
-async function createOrderItem(order_id, orderItems) {
-    if (orderItems.length > 0) {
-        for (const item of orderItems) {
-            await prisma.orderItems.create({
-                data: {
-                    discount: parseFloat(item?.discountPrice),
-                    customisation: parseFloat(item?.cust_price),
-                    price: parseFloat(item?.total),
-                    productId: item?.id,
-                    quantity: Number(item?.boughtQuantity),
-                    order_id: order_id
-                }
-            })
-        }
-    }
-}
 
 module.exports = { PaymentServices }

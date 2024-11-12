@@ -1,7 +1,7 @@
 const authAdmin = require('express').Router();
 const { asyncError } = require('../../libs/errors/asyncError');
 const { apiBadRequestError, apiNotFoundError } = require('../../libs/errors/appError');
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 const { comaparePassword, generateToken, hashedPassword } = require('../../libs/helpers');
 const { verifyToken } = require('../../middlewares/verifyToken');
 
@@ -63,7 +63,8 @@ authAdmin.post('/login', asyncError(async (req, res) => {
 
     res.cookie('auth', `Bearer ${token}`, {
         httpOnly: true,
-        sameSite: false,
+        sameSite: "none",
+        secure: true,
         maxAge,
     })
 

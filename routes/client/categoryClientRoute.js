@@ -1,5 +1,5 @@
 const categoryClientRoute = require('express').Router()
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 const { asyncError } = require('../../libs/errors/asyncError');
 
 

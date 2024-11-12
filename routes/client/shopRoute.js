@@ -1,6 +1,6 @@
 const shopRoute = require('express').Router()
 const { asyncError } = require('../../libs/errors/asyncError');
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 
 // Shipping Costs
 

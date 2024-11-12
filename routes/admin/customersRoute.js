@@ -2,7 +2,7 @@ const customersRoute = require('express').Router()
 const { verifyToken } = require('../../middlewares/verifyToken');
 const { asyncError } = require('../../libs/errors/asyncError');
 const { apiBadRequestError, apiNotFoundError } = require('../../libs/errors/appError');
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 
 
 customersRoute.get('/:id/one', verifyToken(['admin', 'cashier'], 'admin'), asyncError(async (req, res) => {

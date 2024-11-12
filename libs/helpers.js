@@ -35,4 +35,6 @@ const slugify = (text) => {
         .replace(/\-\-+/g, '-');
 };
 
-module.exports = { hashedPassword, slugify, verifyJwtToken, generateToken, comaparePassword }
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+module.exports = { hashedPassword, slugify, verifyJwtToken, generateToken, comaparePassword, emailRegex }

@@ -1,6 +1,6 @@
 const searchRoute = require("express").Router();
 const { asyncError } = require("../../libs/errors/asyncError");
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 
 searchRoute.get('/live', asyncError(async (req, res) => {
     const { searchInput } = req.query
@@ -11,15 +11,7 @@ searchRoute.get('/live', asyncError(async (req, res) => {
                 contains: searchInput
             }
         },
-        select: {
-            name: true, id: true, customable: true, discount: true, slug: true, base_price: true, images: true, stock: true, variants: {
-                select: {
-                    id: true,
-                    price: true,
-                    stock: true,
-                },
-            }
-        },
+        include: { variants: true },
         take: 6,
         orderBy: { name: 'asc' }
     })
@@ -39,15 +31,7 @@ searchRoute.get('/search', asyncError(async (req, res) => {
                 contains: query
             }
         },
-        select: {
-            name: true, id: true, customable: true, discount: true, slug: true, base_price: true, images: true, stock: true, variants: {
-                select: {
-                    id: true,
-                    price: true,
-                    stock: true,
-                },
-            }
-        },
+        include: { variants: true },
         take: take,
         skip: skip,
         orderBy: { name: 'asc' }

@@ -1,7 +1,7 @@
 const downloadRoute = require('express').Router()
 const { asyncError } = require('../../libs/errors/asyncError');
 const { apiBadRequestError } = require('../../libs/errors/appError');
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 const { Parser } = require('json2csv')
 
 

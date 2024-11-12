@@ -1,8 +1,9 @@
 const contactRoute = require('express').Router()
 const { asyncError } = require('../../libs/errors/asyncError');
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 const { apiBadRequestError } = require('../../libs/errors/appError');
 const { sendEmail } = require('../../services/mail');
+const { emailRegex } = require('../../libs/helpers');
 
 
 contactRoute.post('/', asyncError(async (req, res) => {
@@ -10,6 +11,10 @@ contactRoute.post('/', asyncError(async (req, res) => {
 
     if (!name || !email || !message) {
         throw new apiBadRequestError("fill the empty spaces")
+    }
+
+    if (!emailRegex.test(email)) {
+        throw new apiBadRequestError("invalid email")
     }
 
     sendEmail({
@@ -39,6 +44,10 @@ contactRoute.post('/subscribe', asyncError(async (req, res) => {
 
     if (!email) {
         throw new apiBadRequestError("provide your email")
+    }
+
+    if (!emailRegex.test(email)) {
+        throw new apiBadRequestError("invalid email")
     }
 
     const checkEmail = await prisma.subscribers.findFirst({ where: { email: email } });

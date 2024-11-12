@@ -3,7 +3,7 @@ const { asyncError } = require('../../libs/errors/asyncError');
 const { verifyToken } = require('../../middlewares/verifyToken');
 const { apiBadRequestError, apiNotFoundError } = require('../../libs/errors/appError');
 const { slugify } = require('../../libs/helpers');
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 
 
 // get product

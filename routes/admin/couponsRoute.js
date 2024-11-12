@@ -1,7 +1,7 @@
 const couponsRoute = require('express').Router()
 const { verifyToken } = require('../../middlewares/verifyToken');
 const { asyncError } = require('../../libs/errors/asyncError');
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 const { apiBadRequestError, apiNotFoundError } = require('../../libs/errors/appError');
 
 

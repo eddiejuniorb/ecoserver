@@ -1,6 +1,6 @@
 const utilityRoute = require('express').Router();
 const { asyncError } = require('../../libs/errors/asyncError');
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 const { apiNotFoundError } = require('../../libs/errors/appError');
 
 
@@ -145,15 +145,7 @@ utilityRoute.get('/collections/shop', asyncError(async (req, res) => {
             ]
         },
         orderBy: { [sortBy]: identifyer },
-        select: {
-            name: true, id: true, customable: true, discount: true, slug: true, base_price: true, images: true, stock: true, variants: {
-                select: {
-                    id: true,
-                    price: true,
-                    stock: true,
-                },
-            }
-        },
+        include: { variants: true },
         take: take,
         skip: skip,
     });
@@ -260,16 +252,7 @@ utilityRoute.get('/collections/product-category/:category', asyncError(async (re
             ]
         },
         orderBy: { [sortBy]: identifyer },
-
-        select: {
-            name: true, id: true, customable: true, discount: true, slug: true, base_price: true, images: true, stock: true, variants: {
-                select: {
-                    id: true,
-                    price: true,
-                    stock: true,
-                },
-            }
-        },
+        include: { variants: true },
         take: take,
         skip: skip,
     });

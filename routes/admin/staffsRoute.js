@@ -1,7 +1,7 @@
 const staffsRoute = require('express').Router()
 const { asyncError } = require('../../libs/errors/asyncError');
 const { verifyToken } = require('../../middlewares/verifyToken');
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 const { apiBadRequestError, apiNotFoundError } = require('../../libs/errors/appError');
 const { hashedPassword } = require('../../libs/helpers');
 

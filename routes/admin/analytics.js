@@ -1,7 +1,7 @@
 const analyticsRoute = require('express').Router();
 const { asyncError } = require('../../libs/errors/asyncError');
 const { verifyToken } = require('../../middlewares/verifyToken');
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 
 
 

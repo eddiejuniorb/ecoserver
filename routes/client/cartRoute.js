@@ -1,7 +1,7 @@
 const cartRoute = require('express').Router()
 const { asyncError } = require('../../libs/errors/asyncError');
 const { apiBadRequestError, apiNotFoundError } = require('../../libs/errors/appError');
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 
 
 
@@ -11,7 +11,6 @@ const { prisma } = require('../../prisma');
 cartRoute.post('/add', asyncError(async (req, res) => {
 
     const { product, variant, quantity, customise } = req.body;
-    const { sessionID, user_id } = req.cookies;
 
     // Check if product is provided
     if (!product) throw new apiBadRequestError();
@@ -46,26 +45,21 @@ cartRoute.post('/add', asyncError(async (req, res) => {
     total_discount = (Number(foundProduct?.discount) / 100) * parseFloat(price);
 
 
+    // Cart ID
+    const cartId = String(req?.cartId)
 
     // Get the cart items of the user
     let cart = await prisma.cart.findFirst({
-        where: {
-            OR: [
-                { userId: user_id },
-                { sessionId: sessionID }
-            ]
-        },
+        where: { id: cartId },
         include: { items: true }
     })
 
     // if the user doesnt have a cart create a new one
     if (!cart) {
         cart = await prisma.cart.create({
-            data: {
-                sessionId: sessionID,
-                userId: user_id,
-            }
+            data: { id: cartId }
         })
+        return res.sendStatus(200)
     }
 
     // check if there is existing item of the found cart items
@@ -115,14 +109,11 @@ cartRoute.post('/add', asyncError(async (req, res) => {
 // Get all cart items
 
 cartRoute.get('/', asyncError(async (req, res) => {
-    const { sessionID, user_id } = req.cookies;
+    const cartId = req?.cartId
 
     const cart = await prisma.cart.findFirst({
         where: {
-            OR: [
-                { userId: user_id },
-                { sessionId: sessionID }
-            ],
+            id: String(cartId)
         },
         include: { items: { include: { product: true, variant: true }, orderBy: { iat: 'desc' } } },
         orderBy: { iat: 'desc' }
@@ -172,6 +163,7 @@ cartRoute.post('/change', asyncError(async (req, res) => {
                 quantity: item.quantity + 1
             }
         })
+
     } else if (target === "minus") {
         updated = await prisma.cartItems.update({
             where: { id: id }, data: {

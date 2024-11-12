@@ -2,7 +2,7 @@ const othersRoute = require('express').Router()
 const { verifyToken } = require('../../middlewares/verifyToken');
 const { asyncError } = require('../../libs/errors/asyncError');
 const { apiBadRequestError, apiNotFoundError } = require('../../libs/errors/appError');
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 
 
 // Shipping

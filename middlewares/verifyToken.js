@@ -1,7 +1,7 @@
 const { apiBadRequestError, apiForbiddenError, apiNotFoundError, apiUnthorizedError } = require("../libs/errors/appError");
 const { asyncError } = require("../libs/errors/asyncError");
 const { verifyJwtToken } = require("../libs/helpers");
-const { prisma } = require("../prisma");
+const { prisma } = require("../prismaClient");
 
 
 const verifyToken = (role, target) => {

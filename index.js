@@ -15,7 +15,10 @@ const session = require('express-session');
 const cluster = require('cluster');
 const os = require('os')
 const { sendEmail } = require('./services/mail');
-const { prisma } = require('./prisma');
+const { prisma } = require('./prismaClient');
+const { v4: uuid } = require('uuid');
+const myEmitter = require('./services/eventEmitter');
+const mailSuccesfulRegistration = require('./mail/mailRegistration');
 
 
 const numCPUs = os.cpus().length
@@ -49,11 +52,13 @@ if (cluster.isPrimary) {
     );
 
 
+    app.disable('x-powered-by');
 
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(fileUpload())
     app.use(cookieParser());
+
 
     app.use(session({
         secret: process.env.jwt_secret,
@@ -61,11 +66,18 @@ if (cluster.isPrimary) {
         resave: false,
         cookie: {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            secure: true,
+            sameSite: 'none',
             maxAge: 1000 * 60 * 60 * 24
         }
     }))
+
+
+    // Event Emitters
+    myEmitter.on('userRegistered', async (userEmail, firstName) => {
+        await mailSuccesfulRegistration({ name: firstName, to: userEmail })
+    })
+
 
 
     app.post('/upload', upload.single, asyncError(async (req, res) => {
@@ -73,12 +85,35 @@ if (cluster.isPrimary) {
         res.status(200).send(images)
     }))
 
-    app.get('/', asyncError((req, res) => {
-        throw new apiNotFoundError("Not found")
-    }))
+
+    app.use(async (req, res, next) => {
+        // Check if the `cartId` cookie exists
+        if (!req.cookies.cartId) {
+            const newCart = uuid()
+
+            res.cookie('cartId', newCart);
+
+            req.cartId = newCart.id;
+        } else {
+            req.cartId = req.cookies.cartId;
+        }
+        return next();
+    });
+
+
+    app.use('/images', (req, res, next) => {
+        // Check if the requested file is an image
+        if (/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(req.url)) {
+            // Set cache-control header for images
+            res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
+        }
+        next(); // Proceed to serve the static files
+    });
 
     // serve images to the client
-    app.use('/images', express.static('uploads'))
+    app.use('/images', express.static('uploads'), (req, res) => {
+        res.setHeader('Cache-Control', 'public, max-age=31536000')
+    })
 
 
     // Application Routes
@@ -102,19 +137,7 @@ if (cluster.isPrimary) {
             return res.status(error.statusCode).send(error.message);
         }
 
-        sendEmail({
-            from: "contact@ecoshoppegh.com",
-            to: process.env.contact_email,
-            subject: "Error on Server",
-            text: error,
-
-        }, (err, data) => {
-            if (err) {
-                console.log(err);
-                return
-            }
-            return;
-        })
+        console.log(error);
 
         return res.status(500).send("internal server error");
     })

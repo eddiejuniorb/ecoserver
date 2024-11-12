@@ -2,9 +2,10 @@ const authRoute = require("express").Router();
 const { asyncError } = require("../../libs/errors/asyncError");
 const { apiBadRequestError } = require("../../libs/errors/appError");
 const bcrypt = require('bcrypt')
-const { comaparePassword, generateToken } = require("../../libs/helpers");
+const { comaparePassword, generateToken, emailRegex } = require("../../libs/helpers");
 const { verifyToken } = require("../../middlewares/verifyToken");
-const { prisma } = require("../../prisma");
+const { prisma } = require("../../prismaClient");
+const myEmitter = require("../../services/eventEmitter");
 
 
 // Register User
@@ -14,6 +15,10 @@ authRoute.post('/register', asyncError(async (req, res) => {
 
     const emailExist = await prisma.user.findFirst({ where: { email: email } });
 
+    if (!emailRegex.test(email)) {
+        throw new apiBadRequestError("invalid email")
+    }
+
     if (emailExist) throw new apiBadRequestError("email already exists");
 
     const hPassword = await bcrypt.hash(password, 10);
@@ -21,6 +26,7 @@ authRoute.post('/register', asyncError(async (req, res) => {
     const payload = { firstname, lastname, email, password: hPassword };
 
     if (await prisma.user.create({ data: { ...payload } })) {
+        myEmitter.emit('userRegistered', email, firstname)
         res.sendStatus(200);
         return;
     }

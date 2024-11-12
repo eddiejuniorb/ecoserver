@@ -2,7 +2,7 @@ const addressRoute = require('express').Router();
 const { verifyToken } = require('../../middlewares/verifyToken');
 const { asyncError } = require('../../libs/errors/asyncError');
 const { apiBadRequestError, apiForbiddenError } = require('../../libs/errors/appError');
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 
 addressRoute.post('/add', verifyToken(['user'], 'client'), asyncError(async (req, res) => {
 

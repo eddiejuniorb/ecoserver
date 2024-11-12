@@ -1,7 +1,7 @@
 const orderRoute = require('express').Router()
 const { asyncError } = require('../../libs/errors/asyncError');
 const { apiBadRequestError, apiNotFoundError } = require('../../libs/errors/appError');
-const { prisma } = require('../../prisma');
+const { prisma } = require('../../prismaClient');
 const { PaymentServices } = require('../../services/Payment');
 const { verifyToken } = require('../../middlewares/verifyToken');
 
@@ -45,12 +45,7 @@ orderRoute.post('/confirm-order', verifyToken(['user'], 'client'), asyncError(as
     // Cet Cart Items 
 
     const cart = await prisma.cart.findFirst({
-        where: {
-            OR: [
-                { userId: user?.user_id },
-                { sessionId: sessionID }
-            ],
-        },
+        where: { id: req?.cartId },
         include: { items: { include: { product: true, variant: true }, orderBy: { iat: 'desc' } } },
         orderBy: { iat: 'desc' }
     })
@@ -88,7 +83,7 @@ orderRoute.post('/confirm-order', verifyToken(['user'], 'client'), asyncError(as
 
     // Check Delivery Type
     if (!delivery_type || !["ship", "pickup"].includes(delivery_type)) {
-        throw new apiBadRequestError("invalid deliver option")
+        throw new apiBadRequestError("invalid delivery option")
     }
 
     // Check Payment Type
@@ -137,6 +132,7 @@ orderRoute.post('/confirm-order', verifyToken(['user'], 'client'), asyncError(as
 
     }
 
+    // Check if coupon id is correct
     if (coupon_id) {
         const couponData = await prisma.coupon.findUnique({ where: { id: coupon_id } });
         if (!couponData) {
@@ -158,7 +154,7 @@ orderRoute.post('/confirm-order', verifyToken(['user'], 'client'), asyncError(as
 
 
 
-    // Check if order has customisation 
+    // Check if order has customisation and payment type is Cash on delivery
     if (payment_type === "cod" && customisationTotal) {
         throw new apiBadRequestError("order with customisation should be pay before delivery")
     }
@@ -206,24 +202,28 @@ orderRoute.post('/confirm-order', verifyToken(['user'], 'client'), asyncError(as
 
         case "paystack":
 
-            const addOrderByPaystack = {
-                userId: user?.user_id,
-                total: totalCharge,
-                coupon_id: couponId,
-                orderNumber: 3000 + numOfOrders,
-                note: "My note",
-                delivery_type: delivery_type,
-                payment_status: 'unpaid',
-                our_shopId: shop_location_id || "",
-                payment_mode: 'paystack',
-                shippindAddress: shippingAddress,
-                shipping: shippingPrice,
-                discount: couponDiscountPrice,
-                customise_total: customisationTotal
-            }
+            const shopID = String(shop_location_id) || ""
 
-            const metadata = { order: addOrderByPaystack, cartId: cart?.id, cart_items: productInOrders }
+            const addOrderByPaystack = await prisma.order.create({
+                data: {
+                    userId: user?.user_id,
+                    total: totalCharge,
+                    coupon_id: couponId,
+                    orderNumber: 3000 + numOfOrders,
+                    note: "My note",
+                    delivery_type: delivery_type,
+                    payment_status: 'unpaid',
+                    ...(shopID && { our_shopId: shop_location_id }),
+                    payment_mode: 'paystack',
+                    shippindAddress: shippingAddress,
+                    shipping: shippingPrice,
+                    discount: couponDiscountPrice,
+                    customise_total: customisationTotal
+                }
 
+            })
+
+            const metadata = { order_id: addOrderByPaystack?.id };
 
             if (addOrderByPaystack) {
                 const response = await paymentInstance.startPayment({
@@ -232,6 +232,10 @@ orderRoute.post('/confirm-order', verifyToken(['user'], 'client'), asyncError(as
                 })
 
                 if (response) {
+                    if (await prisma.cart.delete({ where: { id: cart?.id } })) {
+                        await createOrderItem(addOrderByPaystack?.id, productInOrders)
+                    }
+
                     return res.status(200).send({
                         type: "paystack",
                         data: response?.data

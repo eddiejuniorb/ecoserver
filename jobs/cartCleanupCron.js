@@ -1,5 +1,5 @@
 const cron = require('node-cron')
-const { prisma } = require('../prisma')
+const { prisma } = require('../prismaClient')
 
 cron.schedule('0 0 * * 0', () => {
 
