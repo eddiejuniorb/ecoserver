@@ -13,6 +13,24 @@ const { utilityRoute } = require('../routes/client/utility');
 const { contactRoute } = require('../routes/client/contact');
 
 
+clientApiGateWay.use((req, res, next) => {
+    // Check if the `cartId` cookie exists
+    if (!req.cookies.cartId) {
+        const newCart = uuid()
+
+        res.cookie('cartId', newCart, {
+            secure: true,
+            sameSite: "none",
+            httpOnly: true,
+        });
+
+        req.cartId = newCart.id;
+    } else {
+        req.cartId = req.cookies.cartId;
+    }
+    return next();
+});
+
 // auth
 clientApiGateWay.use('/auth', authRoute)
 

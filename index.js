@@ -86,20 +86,6 @@ if (cluster.isPrimary) {
     }))
 
 
-    app.use(async (req, res, next) => {
-        // Check if the `cartId` cookie exists
-        if (!req.cookies.cartId) {
-            const newCart = uuid()
-
-            res.cookie('cartId', newCart);
-
-            req.cartId = newCart.id;
-        } else {
-            req.cartId = req.cookies.cartId;
-        }
-        return next();
-    });
-
 
     app.use('/images', (req, res, next) => {
         // Check if the requested file is an image

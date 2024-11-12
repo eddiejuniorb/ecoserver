@@ -50,7 +50,8 @@ authRoute.post('/login', asyncError(async (req, res) => {
 
     res.cookie('auth', `Bearer ${token}`, {
         httpOnly: true,
-        sameSite: false,
+        sameSite: "none",
+        secure: true,
         maxAge,
     })
 
