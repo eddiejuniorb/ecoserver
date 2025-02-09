@@ -1,0 +1,2 @@
+{"timestamp":"2025-01-13T13:08:19.376Z","level":"error","message":"Internal Server Error","meta":{"stack":"TypeError: Cannot read properties of null (reading 'status')\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\client\\track.js:43:15","method":"GET","path":"/client/track/674322"}}
+

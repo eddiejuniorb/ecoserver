@@ -1,0 +1,358 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id              String         @id @default(uuid()) @db.Char(36)
+  name            String         @db.VarChar(250)
+  description     String         @db.Text
+  slug            String         @db.Text
+  subcategory     Subcategory    @relation(fields: [subcategoryId], references: [id])
+  base_price      Decimal        @db.Decimal(10, 0)
+  stock           Int
+  discount        Int?           @default(0)
+  customable      Boolean        @default(false)
+  dealPrice       Float?
+  dealStart       DateTime?      @default(now())
+  dealEnd         DateTime?
+  isBundleProduct Boolean?       @default(false)
+  customise_price Float?         @default(0.00)
+  images          String         @db.Text
+  in_stock        Boolean        @default(true)
+  variants        variants[]
+  orderItems      OrderItems[]
+  views           Int            @default(0)
+  iat             DateTime       @default(now())
+  uat             DateTime       @updatedAt
+  CartItems       CartItems[]
+  specialOffer    specialOffer[]
+  subcategoryId   String         @db.Char(36)
+}
+
+model Category {
+  id          String        @id @default(uuid()) @db.Char(36)
+  name        String        @db.VarChar(250)
+  image       String        @db.VarChar(250)
+  iat         DateTime      @default(now())
+  uat         DateTime      @updatedAt
+  Subcategory Subcategory[]
+}
+
+model Subcategory {
+  id         String    @id @default(uuid()) @db.Char(36)
+  name       String
+  category   Category  @relation(fields: [categoryId], references: [id])
+  categoryId String    @db.Char(36)
+  Product    Product[]
+}
+
+model variants {
+  id         String       @id @default(uuid()) @db.Char(36)
+  image      String?
+  color      String?
+  size       String?
+  material   String?
+  type       String?
+  price      Float
+  stock      Int
+  iat        DateTime     @default(now())
+  product    Product?     @relation(fields: [productId], references: [id])
+  productId  String?      @db.Char(36)
+  CartItems  CartItems[]
+  OrderItems OrderItems[]
+}
+
+model coupon {
+  id           String         @id @default(uuid()) @db.Char(36)
+  code         String
+  discount     Int
+  active       Boolean        @default(true)
+  minimum      Float          @default(0.00)
+  start        DateTime       @default(now())
+  end          DateTime
+  user_coupons user_coupons[]
+  Order        Order[]
+}
+
+model User {
+  id           String         @id @default(uuid()) @db.Char(36)
+  firstname    String         @db.VarChar(250)
+  lastname     String         @db.VarChar(250)
+  role         users_role     @default(user)
+  email        String         @unique
+  phone        String         @unique
+  password     String         @db.VarChar(250)
+  ban          Boolean        @default(false)
+  orders       Order[]
+  iat          DateTime       @default(now())
+  address      address[]
+  user_coupons user_coupons[]
+}
+
+model user_coupons {
+  id         String        @id @default(uuid()) @db.Char(36)
+  user_id    String
+  couponId   String
+  coupon     coupon        @relation(fields: [couponId], references: [id])
+  user       User          @relation(fields: [user_id], references: [id])
+  applied_at DateTime      @default(now())
+  status     coupon_status @default(applied)
+}
+
+model Order {
+  id              String         @id @default(uuid()) @db.Char(36)
+  userId          String
+  total           Decimal        @db.Decimal(10, 0)
+  status          orderStatus    @default(placed)
+  order_items     OrderItems[]
+  payment_status  payment_status @default(unpaid)
+  payment_mode    payment_mode
+  coupon_id       String?
+  coupon          coupon?        @relation(fields: [coupon_id], references: [id])
+  orderNumber     Int            @default(0)
+  note            String?
+  delivery_type   delivery_type  @default(ship)
+  pickup_location our_shop?      @relation(fields: [our_shopId], references: [id])
+  iat             DateTime       @default(now())
+  uat             DateTime       @updatedAt
+  User            User           @relation(fields: [userId], references: [id])
+  customise_total Float          @default(0.00)
+  shipping        Float          @default(0.00)
+  discount        Float          @default(0.00)
+  shippindAddress Json?
+  our_shopId      String?        @default("")
+}
+
+model address {
+  id         String   @id @default(uuid()) @db.Char(36)
+  firstname  String
+  lastname   String?
+  company    String?
+  AddressOne String
+  AdressTwo  String?
+  user_id    String
+  User       User     @relation(fields: [user_id], references: [id])
+  city       String
+  country    String
+  phone      String
+  iat        DateTime @default(now())
+}
+
+model OrderItems {
+  id            String    @id @default(uuid()) @db.Char(36)
+  order_id      String
+  Order         Order     @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  productId     String
+  variant       variants? @relation(fields: [variantsId], references: [id])
+  quantity      Int
+  price         Decimal   @db.Decimal(10, 0)
+  customisation Float?    @default(0.00)
+  discount      Float?    @default(0.00)
+  iat           DateTime  @default(now())
+  uat           DateTime  @updatedAt
+  Product       Product   @relation(fields: [productId], references: [id])
+  variantsId    String?   @db.Char(36)
+}
+
+model Cart {
+  id    String      @id @default(uuid()) @db.Char(36)
+  items CartItems[]
+  user  String
+  iat   DateTime    @default(now())
+}
+
+model CartItems {
+  id                  String    @id @default(uuid()) @db.Char(36)
+  productId           String
+  variant_id          String?
+  variant             variants? @relation(fields: [variant_id], references: [id])
+  product             Product   @relation(fields: [productId], references: [id])
+  price               Float
+  discount            Float
+  customisation_price Float
+  customise           Boolean
+  Cart                Cart?     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  cartId              String?
+  quantity            Int
+  iat                 DateTime  @default(now())
+}
+
+model banner {
+  id          String @id @default(uuid()) @db.Char(36)
+  image       String
+  title       String
+  sub_title   String
+  description String
+  link_name   String
+  link_url    String
+}
+
+model specialOffer {
+  id          String   @id @default(uuid()) @db.Char(36)
+  title       String
+  image       String
+  description String
+  product     Product  @relation(fields: [productId], references: [id])
+  productId   String   @db.Char(36)
+  iat         DateTime @default(now())
+  uat         DateTime @updatedAt
+}
+
+model resetTokens {
+  token      String   @unique
+  user_id    String   @id
+  iat        DateTime @default(now())
+  expires_at DateTime
+}
+
+model on_sales {
+  id          String   @id @default(uuid()) @db.Char(36)
+  image       String
+  sub_title   String
+  title       String
+  description String
+  link_name   String
+  link_url    String
+  iat         DateTime @default(now())
+  uat         DateTime @updatedAt
+}
+
+model smallHeader {
+  id        String   @id @default(uuid()) @db.Char(36)
+  title     String
+  link_name String
+  link_url  String
+  iat       DateTime @default(now())
+  uat       DateTime @updatedAt
+}
+
+model seo {
+  id               String @id @default(uuid()) @db.Char(36)
+  favicon          String
+  meta_title       String
+  meta_description String
+  meta_url         String
+  meta_keywords    String
+  meta_image       String
+}
+
+model faqs {
+  id       String   @id @default(uuid()) @db.Char(36)
+  question String
+  answer   String
+  iat      DateTime @default(now())
+}
+
+model updateInfo {
+  id      String  @id @default(uuid()) @db.Char(36)
+  message String
+  enabled Boolean @default(false)
+}
+
+model shipping_cost {
+  id        String @id @default(uuid()) @db.Char(36)
+  area_name String
+  cost      Float
+}
+
+model subscribers {
+  id    String @id @default(uuid()) @db.Char(36)
+  email String
+}
+
+model our_shop {
+  id                  String   @id @default(uuid()) @db.Char(36)
+  name                String
+  image               String
+  address             String
+  telephone           String
+  email               String?
+  time_avalable1      String
+  time_avalable2      String?
+  google_address_link String
+  iat                 DateTime @default(now())
+  uat                 DateTime @updatedAt
+  Order               Order[]
+}
+
+model termCondition {
+  id      String @id @default(uuid()) @db.Char(36)
+  content String @db.LongText
+}
+
+model storeSetting {
+  id               String  @id @default(uuid()) @db.Char(36)
+  cash_on_delivery Boolean @default(true)
+  paystack         Boolean @default(true)
+}
+
+model privacyPolicy {
+  id      String @id @default(uuid()) @db.Char(36)
+  content String @db.LongText
+}
+
+model staffs {
+  id              String     @id @default(uuid()) @db.Char(36)
+  firstname       String
+  lastname        String
+  email           String     @unique
+  password        String
+  display_picture String
+  role            admin_role @default(cashier)
+  iat             DateTime   @default(now())
+  uat             DateTime   @updatedAt
+}
+
+enum payment_status {
+  unpaid
+  paid
+}
+
+enum admin_role {
+  admin
+  cashier
+  operator
+}
+
+enum users_role {
+  user
+  admin
+  cashier
+  operator
+}
+
+enum products_variant_type {
+  none
+  size
+  color
+  color_size
+}
+
+enum orderStatus {
+  placed
+  processing
+  ready
+  cancelled
+  en_route
+  delivered
+}
+
+enum coupon_status {
+  used
+  applied
+}
+
+enum delivery_type {
+  ship
+  pickup
+}
+
+enum payment_mode {
+  cod
+  paystack
+}

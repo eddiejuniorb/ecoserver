@@ -1,0 +1,10 @@
+{"timestamp":"2024-12-31T14:43:03.471Z","level":"error","message":"Internal Server Error","meta":{"stack":"SyntaxError: \"undefined\" is not valid JSON\n    at JSON.parse (<anonymous>)\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\admin\\productAdminRoute.js:242:35","method":"POST","path":"/admin/product/update/d2aff608-7546-485e-92bd-df0c3ddcdce5"}}
+
+{"timestamp":"2024-12-31T14:43:45.543Z","level":"error","message":"Internal Server Error","meta":{"stack":"SyntaxError: \"undefined\" is not valid JSON\n    at JSON.parse (<anonymous>)\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\admin\\productAdminRoute.js:244:35","method":"POST","path":"/admin/product/update/d2aff608-7546-485e-92bd-df0c3ddcdce5"}}
+
+{"timestamp":"2024-12-31T14:45:18.228Z","level":"error","message":"Internal Server Error","meta":{"stack":"SyntaxError: \"undefined\" is not valid JSON\n    at JSON.parse (<anonymous>)\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\admin\\productAdminRoute.js:244:35","method":"POST","path":"/admin/product/update/d2aff608-7546-485e-92bd-df0c3ddcdce5"}}
+
+{"timestamp":"2024-12-31T14:47:28.134Z","level":"error","message":"Internal Server Error","meta":{"stack":"SyntaxError: \"undefined\" is not valid JSON\n    at JSON.parse (<anonymous>)\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\admin\\productAdminRoute.js:243:35","method":"POST","path":"/admin/product/update/d2aff608-7546-485e-92bd-df0c3ddcdce5"}}
+
+{"timestamp":"2024-12-31T14:47:29.909Z","level":"error","message":"Internal Server Error","meta":{"stack":"SyntaxError: \"undefined\" is not valid JSON\n    at JSON.parse (<anonymous>)\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\admin\\productAdminRoute.js:243:35","method":"POST","path":"/admin/product/update/d2aff608-7546-485e-92bd-df0c3ddcdce5"}}
+

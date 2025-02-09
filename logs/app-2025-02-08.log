@@ -1,0 +1,20 @@
+{"timestamp":"2025-02-08T11:51:55.142Z","level":"error","message":"Internal Server Error","meta":{"stack":"ReferenceError: filteredproducts is not defined\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\client\\productClientRoute.js:77:41","method":"GET","path":"/client/product/new"}}
+
+{"timestamp":"2025-02-08T11:51:56.188Z","level":"error","message":"Internal Server Error","meta":{"stack":"ReferenceError: filteredproducts is not defined\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\client\\productClientRoute.js:77:41","method":"GET","path":"/client/product/new"}}
+
+{"timestamp":"2025-02-08T11:51:58.203Z","level":"error","message":"Internal Server Error","meta":{"stack":"ReferenceError: filteredproducts is not defined\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\client\\productClientRoute.js:77:41","method":"GET","path":"/client/product/new"}}
+
+{"timestamp":"2025-02-08T11:52:02.231Z","level":"error","message":"Internal Server Error","meta":{"stack":"ReferenceError: filteredproducts is not defined\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\client\\productClientRoute.js:77:41","method":"GET","path":"/client/product/new"}}
+
+{"timestamp":"2025-02-08T11:53:03.211Z","level":"error","message":"Internal Server Error","meta":{"stack":"ReferenceError: data is not defined\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\client\\productClientRoute.js:77:35","method":"GET","path":"/client/product/new"}}
+
+{"timestamp":"2025-02-08T11:53:03.221Z","level":"error","message":"Internal Server Error","meta":{"stack":"ReferenceError: data is not defined\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\client\\productClientRoute.js:92:35","method":"GET","path":"/client/product/popular"}}
+
+{"timestamp":"2025-02-08T11:53:04.257Z","level":"error","message":"Internal Server Error","meta":{"stack":"ReferenceError: data is not defined\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\client\\productClientRoute.js:77:35","method":"GET","path":"/client/product/new"}}
+
+{"timestamp":"2025-02-08T11:53:04.258Z","level":"error","message":"Internal Server Error","meta":{"stack":"ReferenceError: data is not defined\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\client\\productClientRoute.js:92:35","method":"GET","path":"/client/product/popular"}}
+
+{"timestamp":"2025-02-08T11:53:06.285Z","level":"error","message":"Internal Server Error","meta":{"stack":"ReferenceError: data is not defined\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\client\\productClientRoute.js:92:35","method":"GET","path":"/client/product/popular"}}
+
+{"timestamp":"2025-02-08T11:53:06.287Z","level":"error","message":"Internal Server Error","meta":{"stack":"ReferenceError: data is not defined\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\client\\productClientRoute.js:77:35","method":"GET","path":"/client/product/new"}}
+
