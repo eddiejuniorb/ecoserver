@@ -1,8 +1,0 @@
-{"timestamp":"2025-01-11T21:36:23.697Z","level":"error","message":"Internal Server Error","meta":{"stack":"ReferenceError: take is not defined\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\client\\productClientRoute.js:20:42","method":"GET","path":"/client/product/bundles"}}
-
-{"timestamp":"2025-01-11T21:36:24.768Z","level":"error","message":"Internal Server Error","meta":{"stack":"ReferenceError: take is not defined\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\client\\productClientRoute.js:20:42","method":"GET","path":"/client/product/bundles"}}
-
-{"timestamp":"2025-01-11T21:36:26.807Z","level":"error","message":"Internal Server Error","meta":{"stack":"ReferenceError: take is not defined\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\client\\productClientRoute.js:20:42","method":"GET","path":"/client/product/bundles"}}
-
-{"timestamp":"2025-01-11T21:36:37.255Z","level":"error","message":"Internal Server Error","meta":{"stack":"ReferenceError: take is not defined\n    at C:\\Users\\hp\\Desktop\\ecoserver\\routes\\client\\productClientRoute.js:20:42","method":"GET","path":"/client/product/bundles"}}
-

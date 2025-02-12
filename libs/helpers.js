@@ -41,6 +41,7 @@ const setAuthCookie = ({ res, token, maxAge }) => {
     res.cookie('auth', `Bearer ${token}`, {
         httpOnly: true,
         sameSite: "None",
+	domain: ".ecoshoppegh.com",
         secure: true,
         maxAge,
     })

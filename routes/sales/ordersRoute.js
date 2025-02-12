@@ -173,22 +173,10 @@ const getSalesSegment = async () => {
 
 async function getLast5dayOfSalesandOrders() {
 
-    const orders = await prisma.$queryRaw`
-    WITH RECURSIVE DateRange AS (
-      SELECT CURDATE() - INTERVAL 4 DAY AS date
-      UNION ALL
-      SELECT date + INTERVAL 1 DAY
-      FROM DateRange
-      WHERE date < CURDATE()
-    )
-    SELECT 
-      DateRange.date AS date,
-      COUNT(\`order\`.id) AS orders
-    FROM DateRange
-    LEFT JOIN \`order\` ON DATE(\`order\`.iat) = DateRange.date
-    GROUP BY DateRange.date
-    ORDER BY DateRange.date ASC;
-  `;
+    const orders = await prisma.order.findMany({
+        select: { total: true, payment_status: true },
+        take: 5,
+    })
 
     return { orders }
 }

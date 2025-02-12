@@ -23,8 +23,11 @@ class AuthController {
             }
 
             const token = await generateToken({ user_id: user?.id, email: user?.email });
+  	    const maxAge = 14 * 24 * 60 * 60 * 1000;
 
-            return res.status(200).send({ token })
+            setAuthCookie({ res: res, token: token, maxAge: maxAge })
+            
+	    return res.status(200).send({ token })
         })
     }
 

@@ -19,26 +19,24 @@ const os = require('os')
 const { prisma } = require('./prismaClient');
 const { orderApiGateway } = require('./apis/orderApiGateway');
 const Logger = require('./libs/Logger');
-const crypto = require('crypto')
 
 const logger = new Logger('./logs/app.log', 'info')
 
 const numCPUs = os.cpus().length
 
-// if (cluster.isPrimary) {
-
-//     for (let i = 0; i < numCPUs; i++) {
-//         cluster.fork()
-//     }
-
-
-//     cluster.on('exit', (worker, code, signal) => {
-//         console.log(`Worker ${worker.process.pid} died`);
-//         // Optionally restart worker
-//     });
+ if (cluster.isPrimary) {
+     for (let i = 0; i < numCPUs; i++) {
+         cluster.fork()
+     }
 
 
-// } else {
+     cluster.on('exit', (worker, code, signal) => {
+         console.log(`Worker ${worker.process.pid} died`);
+         // Optionally restart worker
+     });
+
+
+ } else {
 
 const app = express();
 const server = http.createServer(app)
@@ -48,8 +46,8 @@ const port = process.env.PORT || 5000;
 app.use(
     cors({
         credentials: true,
-        origin: ["http://localhost:3000", "http://localhost:3001",
-            "http://localhost:5173", "http://localhost:3002"],
+        origin: ["https://www.ecoshoppegh.com", "https://ecoshoppegh.com", "http://localhost:3000",
+            "https://admin.ecoshoppegh.com", "https://orders.ecoshoppegh.com"],
     })
 );
 
@@ -141,4 +139,4 @@ server.listen(port, () => {
     console.log(`Server is up and running on port ${port}`);
 })
 
-// }
+ }

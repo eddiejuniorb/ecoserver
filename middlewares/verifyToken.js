@@ -1,3 +1,4 @@
+
 const { apiBadRequestError, apiForbiddenError, apiNotFoundError, apiUnthorizedError } = require("../libs/errors/appError");
 const { asyncError } = require("../libs/errors/asyncError");
 const { verifyJwtToken } = require("../libs/helpers");
@@ -12,6 +13,7 @@ class baseTokenMiddleware {
 
         const user = await prisma[model].findFirst({ where: { email: payload?.email } })
 
+console.log(payload,user);
         if (!user) {
             throw new apiNotFoundError("No user found")
         }
@@ -27,7 +29,8 @@ class baseTokenMiddleware {
     static verify(role, target) {
         return asyncError(async (req, res, next) => {
             const tokenHeader = req.cookies?.auth || req.headers?.auth;
-            if (!tokenHeader) throw new apiUnthorizedError();
+console.log(tokenHeader)            
+if (!tokenHeader) throw new apiUnthorizedError();
             if (!tokenHeader.startsWith('Bearer ')) throw new apiUnthorizedError("bad token");
 
             const token = tokenHeader.split(" ")[1];

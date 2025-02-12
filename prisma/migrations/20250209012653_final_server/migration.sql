@@ -1,4 +1,29 @@
 -- CreateTable
+CREATE TABLE `Product` (
+    `id` CHAR(36) NOT NULL,
+    `name` VARCHAR(250) NOT NULL,
+    `description` TEXT NOT NULL,
+    `slug` TEXT NOT NULL,
+    `base_price` DECIMAL(10, 0) NOT NULL,
+    `stock` INTEGER NOT NULL,
+    `discount` INTEGER NULL DEFAULT 0,
+    `customable` BOOLEAN NOT NULL DEFAULT false,
+    `dealPrice` DOUBLE NULL,
+    `dealStart` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `dealEnd` DATETIME(3) NULL,
+    `isBundleProduct` BOOLEAN NULL DEFAULT false,
+    `customise_price` DOUBLE NULL DEFAULT 0.00,
+    `images` TEXT NOT NULL,
+    `in_stock` BOOLEAN NOT NULL DEFAULT true,
+    `views` INTEGER NOT NULL DEFAULT 0,
+    `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `uat` DATETIME(3) NOT NULL,
+    `subcategoryId` CHAR(36) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `Category` (
     `id` CHAR(36) NOT NULL,
     `name` VARCHAR(250) NOT NULL,
@@ -10,22 +35,10 @@ CREATE TABLE `Category` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Product` (
+CREATE TABLE `Subcategory` (
     `id` CHAR(36) NOT NULL,
-    `name` VARCHAR(250) NOT NULL,
-    `description` TEXT NOT NULL,
-    `slug` TEXT NOT NULL,
-    `category_id` VARCHAR(191) NOT NULL,
-    `base_price` DECIMAL(10, 0) NOT NULL,
-    `stock` INTEGER NOT NULL,
-    `discount` INTEGER NULL DEFAULT 0,
-    `customable` BOOLEAN NOT NULL DEFAULT false,
-    `customise_price` DOUBLE NULL DEFAULT 0.00,
-    `images` TEXT NOT NULL,
-    `publish` BOOLEAN NOT NULL DEFAULT true,
-    `views` INTEGER NOT NULL DEFAULT 0,
-    `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `uat` DATETIME(3) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `categoryId` CHAR(36) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -44,26 +57,6 @@ CREATE TABLE `variants` (
     `productId` CHAR(36) NULL,
 
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `bundlePackage` (
-    `id` CHAR(36) NOT NULL,
-    `name` VARCHAR(191) NOT NULL,
-    `description` VARCHAR(191) NOT NULL,
-    `image` VARCHAR(191) NOT NULL,
-    `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-
-    UNIQUE INDEX `bundlePackage_name_key`(`name`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `bundleProducts` (
-    `product_id` VARCHAR(191) NOT NULL,
-    `bundlePackage_id` VARCHAR(191) NOT NULL,
-
-    PRIMARY KEY (`product_id`, `bundlePackage_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -86,11 +79,13 @@ CREATE TABLE `User` (
     `lastname` VARCHAR(250) NOT NULL,
     `role` ENUM('user', 'admin', 'cashier', 'operator') NOT NULL DEFAULT 'user',
     `email` VARCHAR(191) NOT NULL,
+    `phone` VARCHAR(191) NOT NULL,
     `password` VARCHAR(250) NOT NULL,
     `ban` BOOLEAN NOT NULL DEFAULT false,
     `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     UNIQUE INDEX `User_email_key`(`email`),
+    UNIQUE INDEX `User_phone_key`(`phone`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -110,7 +105,7 @@ CREATE TABLE `Order` (
     `id` CHAR(36) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
     `total` DECIMAL(10, 0) NOT NULL,
-    `status` ENUM('pending', 'processing', 'cancelled', 'delivered', 'out_for_delivery', 'shipped') NOT NULL DEFAULT 'pending',
+    `status` ENUM('placed', 'processing', 'ready', 'cancelled', 'en_route', 'delivered') NOT NULL DEFAULT 'placed',
     `payment_status` ENUM('unpaid', 'paid') NOT NULL DEFAULT 'unpaid',
     `payment_mode` ENUM('cod', 'paystack') NOT NULL,
     `coupon_id` VARCHAR(191) NULL,
@@ -156,6 +151,7 @@ CREATE TABLE `OrderItems` (
     `discount` DOUBLE NULL DEFAULT 0.00,
     `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `uat` DATETIME(3) NOT NULL,
+    `variantsId` CHAR(36) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -163,6 +159,7 @@ CREATE TABLE `OrderItems` (
 -- CreateTable
 CREATE TABLE `Cart` (
     `id` CHAR(36) NOT NULL,
+    `user` VARCHAR(191) NOT NULL,
     `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
@@ -181,7 +178,6 @@ CREATE TABLE `CartItems` (
     `quantity` INTEGER NOT NULL,
     `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
-    UNIQUE INDEX `CartItems_productId_customise_variant_id_key`(`productId`, `customise`, `variant_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -196,6 +192,30 @@ CREATE TABLE `banner` (
     `link_url` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `specialOffer` (
+    `id` CHAR(36) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
+    `image` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NOT NULL,
+    `productId` CHAR(36) NOT NULL,
+    `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `uat` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `resetTokens` (
+    `token` VARCHAR(191) NOT NULL,
+    `user_id` VARCHAR(191) NOT NULL,
+    `iat` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `expires_at` DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `resetTokens_token_key`(`token`),
+    PRIMARY KEY (`user_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -253,18 +273,6 @@ CREATE TABLE `updateInfo` (
     `id` CHAR(36) NOT NULL,
     `message` VARCHAR(191) NOT NULL,
     `enabled` BOOLEAN NOT NULL DEFAULT false,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `promotional` (
-    `id` CHAR(36) NOT NULL,
-    `title` VARCHAR(191) NOT NULL,
-    `image` VARCHAR(191) NOT NULL,
-    `description` VARCHAR(191) NOT NULL,
-    `link_name` VARCHAR(191) NOT NULL,
-    `link_url` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -345,16 +353,13 @@ CREATE TABLE `staffs` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `Product` ADD CONSTRAINT `Product_category_id_fkey` FOREIGN KEY (`category_id`) REFERENCES `Category`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Product` ADD CONSTRAINT `Product_subcategoryId_fkey` FOREIGN KEY (`subcategoryId`) REFERENCES `Subcategory`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Subcategory` ADD CONSTRAINT `Subcategory_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `Category`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `variants` ADD CONSTRAINT `variants_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `bundleProducts` ADD CONSTRAINT `bundleProducts_product_id_fkey` FOREIGN KEY (`product_id`) REFERENCES `Product`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `bundleProducts` ADD CONSTRAINT `bundleProducts_bundlePackage_id_fkey` FOREIGN KEY (`bundlePackage_id`) REFERENCES `bundlePackage`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `user_coupons` ADD CONSTRAINT `user_coupons_couponId_fkey` FOREIGN KEY (`couponId`) REFERENCES `coupon`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -378,6 +383,9 @@ ALTER TABLE `address` ADD CONSTRAINT `address_user_id_fkey` FOREIGN KEY (`user_i
 ALTER TABLE `OrderItems` ADD CONSTRAINT `OrderItems_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `OrderItems` ADD CONSTRAINT `OrderItems_variantsId_fkey` FOREIGN KEY (`variantsId`) REFERENCES `variants`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `OrderItems` ADD CONSTRAINT `OrderItems_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -388,3 +396,6 @@ ALTER TABLE `CartItems` ADD CONSTRAINT `CartItems_productId_fkey` FOREIGN KEY (`
 
 -- AddForeignKey
 ALTER TABLE `CartItems` ADD CONSTRAINT `CartItems_cartId_fkey` FOREIGN KEY (`cartId`) REFERENCES `Cart`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `specialOffer` ADD CONSTRAINT `specialOffer_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
