@@ -223,6 +223,8 @@ productAdminRoute.post('/update/:id', verifyJwtTokenAdmins.adminCashier(), async
 
     const productId = req.params?.id
 
+    console.log(req.body);
+
     if (!productId) throw new apiBadRequestError("provide product id");
 
     const productFound = await prisma.product.findFirst({ where: { id: productId } })
