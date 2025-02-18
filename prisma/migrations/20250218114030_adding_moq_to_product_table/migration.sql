@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Product` ADD COLUMN `moq` DECIMAL(65, 30) NULL DEFAULT 0;

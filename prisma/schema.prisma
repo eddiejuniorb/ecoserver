@@ -14,6 +14,7 @@ model Product {
   slug            String         @db.Text
   subcategory     Subcategory    @relation(fields: [subcategoryId], references: [id])
   base_price      Decimal        @db.Decimal(10, 0)
+  moq             Decimal?       @default(0)
   stock           Int
   discount        Int?           @default(0)
   customable      Boolean        @default(false)
