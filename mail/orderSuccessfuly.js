@@ -196,7 +196,7 @@ async function orderSuccessMail({ order }) {
 </html>
     `
   return sendEmail({
-    from: "Ecoshoppe Ghana <contact@ecoshoppegh.com>",
+    from: "Ecoshoppe Ghana <no-reply@ecoshoppegh.wiki>",
     to: order?.User?.email,
     subject: `Thank You for Your Order! 🛒 Order #${order?.orderNumber} Confirmed`,
     html: htmlBody

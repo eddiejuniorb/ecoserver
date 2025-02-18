@@ -527,7 +527,7 @@ async function mailSuccesfulRegistration({ name, to }) {
     
     `
   return sendEmail({
-    from: "Ecoshoppe Ghana <contact@ecoshoppegh.com>",
+    from: "Ecoshoppe Ghana <no-reply@ecoshoppegh.wiki>",
     to: to,
     subject: "Welcome to Ecoshoppe Ghana! 🎉 Your Account is Ready!",
     html: htmlBody

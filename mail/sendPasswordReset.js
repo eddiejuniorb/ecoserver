@@ -2,7 +2,7 @@ const { sendEmail } = require("../services/mail")
 
 async function sendPasswordReset({ to, url }) {
 
-    const htmlBody = `
+  const htmlBody = `
      <div class="email-container" style="margin: 50px auto; max-width: 700px">
       <h2>ECOSHOPPE</h2>
       <div style="margin-top: 20px">
@@ -31,18 +31,18 @@ async function sendPasswordReset({ to, url }) {
       </div>
     </div>
     `
-    return sendEmail({
-        from: "Ecoshoppe Ghana <contact@ecoshoppegh.com>",
-        to: to,
-        subject: `Customer account password reset`,
-        html: htmlBody
-    }, (err, res) => {
-        if (err) {
-            console.log("Error while sending mail", err);
-        } else {
-            console.log("Mail sent");
-        }
-    })
+  return sendEmail({
+    from: "Ecoshoppe Ghana <no-reply@ecoshoppegh.wiki>",
+    to: to,
+    subject: `Customer account password reset`,
+    html: htmlBody
+  }, (err, res) => {
+    if (err) {
+      console.log("Error while sending mail", err);
+    } else {
+      console.log("Mail sent");
+    }
+  })
 }
 
 module.exports = sendPasswordReset

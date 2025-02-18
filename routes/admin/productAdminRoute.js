@@ -233,7 +233,7 @@ productAdminRoute.post('/update/:id', verifyJwtTokenAdmins.adminCashier(), async
 
     const { name, description, base_price, isPromo, dealPrice, dealEnd, dealStart, stock, isBundleProduct, in_stock, discount, sub_category, customable, customise_price, images, } = req.body;
 
-    if (!name || !description || !base_price || !stock || !images || !sub_category || !in_stock || !customable || !customise_price) {
+    if (!name || !description || !base_price || !stock || !images || !sub_category || !in_stock) {
         throw new apiBadRequestError("fill the empty spaces")
     } else if (JSON.parse(isPromo)) {
         if (!dealEnd || !dealPrice) {

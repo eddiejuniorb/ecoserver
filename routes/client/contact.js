@@ -18,7 +18,7 @@ contactRoute.post('/', asyncError(async (req, res) => {
     }
 
     sendEmail({
-        from: "Ecoshoppe Ghana <contact@ecoshoppegh.com>",
+        from: "Ecoshoppe Ghana <no-reply@ecoshoppegh.wiki>",
         to: process.env.contact_email,
         subject: "New Contact Form Submission",
         text: `You have a new message from ${name}.\n\nEmail: ${email}\nMessage: ${message}`,

@@ -28,7 +28,7 @@ async function orderCancellation({ data, reason }) {
         </div>
     `
     return sendEmail({
-        from: "Ecoshoppe Ghana <contact@ecoshoppegh.com>",
+        from: "Ecoshoppe Ghana <no-reply@ecoshoppegh.wiki>",
         to: data?.User?.email,
         subject: `Your Order ${data?.orderNumber} Has Been Cancelled`,
         html: htmlBody

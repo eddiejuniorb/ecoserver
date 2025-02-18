@@ -46,7 +46,7 @@ orderRoute.get('/orders', verifyJwtTokenClients.clientOnly(), asyncError(async (
 // Add Order
 
 orderRoute.post('/confirm-order', verifyJwtTokenClients.clientOnly(), asyncError(async (req, res) => {
-    const { delivery_type, payment_type, customer_email, shop_location_id, shipping_address, coupon_id, shipping_id } = req.body;
+    const { note, delivery_type, payment_type, customer_email, shop_location_id, shipping_address, coupon_id, shipping_id } = req.body;
     const user = req?.user
 
     // Cet Cart Items 
@@ -226,7 +226,7 @@ orderRoute.post('/confirm-order', verifyJwtTokenClients.clientOnly(), asyncError
                         total: totalCharge,
                         coupon_id: couponId,
                         orderNumber: order_num_gen,
-                        note: "My note",
+                        note: String(note),
                         delivery_type: delivery_type,
                         payment_status: 'unpaid',
                         ...(shopID && { our_shopId: shop_location_id }),
@@ -280,7 +280,7 @@ orderRoute.post('/confirm-order', verifyJwtTokenClients.clientOnly(), asyncError
                         total: totalCharge,
                         coupon_id: couponId,
                         orderNumber: order_num_gen,
-                        note: "My note",
+                        note: String(note),
                         delivery_type: delivery_type,
                         payment_status: 'unpaid',
                         our_shopId: shop_location_id,
