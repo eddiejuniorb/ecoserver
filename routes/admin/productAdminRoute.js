@@ -111,7 +111,7 @@ productAdminRoute.get('/all', verifyJwtTokenAdmins.adminCashier(), asyncError(as
 
 productAdminRoute.post('/add', verifyJwtTokenAdmins.adminCashier(), asyncError(async (req, res) => {
 
-    const { name, dealPrice, isBundleProduct,
+    const { name, dealPrice, isBundleProduct, moq,
         dealStart, isPromo, dealEnd, description, base_price, stock, discount,
         customable, category, sub_category, images, variants, customise_price
     } = req.body;
@@ -171,6 +171,7 @@ productAdminRoute.post('/add', verifyJwtTokenAdmins.adminCashier(), asyncError(a
                 dealStart: dealStart ? promoDealStarts : null,
                 subcategoryId: sub_category,
                 isBundleProduct: JSON.parse(isBundleProduct),
+                moq: parseInt(moq) || 0,
                 customise_price: parseFloat(customise_price),
                 slug: slugify(name),
                 variants: {
@@ -195,6 +196,7 @@ productAdminRoute.post('/add', verifyJwtTokenAdmins.adminCashier(), asyncError(a
                 dealPrice: parseFloat(dealPrice),
                 isBundleProduct: JSON.parse(isBundleProduct),
                 dealStart: dealStart ? promoDealStarts : null,
+                moq: parseInt(moq) || 0,
                 customise_price: parseFloat(customise_price),
                 slug: slugify(name),
             }
@@ -223,15 +225,13 @@ productAdminRoute.post('/update/:id', verifyJwtTokenAdmins.adminCashier(), async
 
     const productId = req.params?.id
 
-    console.log(req.body);
-
     if (!productId) throw new apiBadRequestError("provide product id");
 
     const productFound = await prisma.product.findFirst({ where: { id: productId } })
 
     if (!productFound) throw new apiNotFoundError("no product found");
 
-    const { name, description, base_price, isPromo, dealPrice, dealEnd, dealStart, stock, isBundleProduct, in_stock, discount, sub_category, customable, customise_price, images, } = req.body;
+    const { name, moq, description, base_price, isPromo, dealPrice, dealEnd, dealStart, stock, isBundleProduct, in_stock, discount, sub_category, customable, customise_price, images, } = req.body;
 
     if (!name || !description || !base_price || !stock || !images || !sub_category || !in_stock) {
         throw new apiBadRequestError("fill the empty spaces")
@@ -250,8 +250,6 @@ productAdminRoute.post('/update/:id', verifyJwtTokenAdmins.adminCashier(), async
         dealPriceData = parseFloat(dealPrice)
     }
 
-    console.log(sub_category);
-
     const updatedProduct = await prisma.product.update({
         where: { id: productFound?.id },
         data: {
@@ -266,6 +264,7 @@ productAdminRoute.post('/update/:id', verifyJwtTokenAdmins.adminCashier(), async
             customable: JSON.parse(customable),
             isBundleProduct: JSON.parse(isBundleProduct),
             slug: slugify(name),
+            moq: parseInt(moq) || 0,
             customise_price: parseFloat(customise_price),
             ...(JSON.parse(isPromo) && { dealEnd: dealEndDate }),
             ...(JSON.parse(isPromo) && { dealPrice: dealPriceData }),
