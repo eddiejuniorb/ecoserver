@@ -20,6 +20,11 @@ cartRoute.post('/add', asyncError(async (req, res) => {
 
     if (!foundProduct) throw new apiBadRequestError("no product found")
 
+    // check if product has moq and the quantity is less than the moq requirement
+    if (foundProduct?.moq && quantity < moq) {
+        throw new apiBadRequestError("Quantity is below the minimum order requirement.")
+    }
+
     // price , total_discount & customisation price
     let price = 0.00, total_discount = 0.00, customisation = 0.00;
 
