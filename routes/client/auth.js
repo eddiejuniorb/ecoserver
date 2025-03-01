@@ -16,7 +16,8 @@ authRoute.post('/register', asyncError(async (req, res) => {
     const { firstname, lastname, email, password, phone, code } = req.body
     if (!firstname || !lastname || !email || !password || !phone || !code) throw new apiBadRequestError("fill the empty spaces");
 
-    const emailExist = await prisma.user.findFirst({ where: { OR: [{ email: email }, { phone: phone }] } });
+    const emailExist = await prisma.user.findFirst({ where: { email: email } });
+    const phoneExists = await prisma.user.findFirst({ where: { phone: phone } })
 
     const telephoneNumber = `${code}${phone}`
 
@@ -29,6 +30,7 @@ authRoute.post('/register', asyncError(async (req, res) => {
     }
 
     if (emailExist) throw new apiBadRequestError("email already exists");
+    if (phoneExists) throw new apiBadRequestError("user with phone number exists")
 
     const hPassword = await bcrypt.hash(password, 10);
 

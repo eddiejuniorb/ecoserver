@@ -41,7 +41,6 @@ cartRoute.post('/add', asyncError(async (req, res) => {
     } else if (variant) {
         const vP = await prisma.variants.findFirst({ where: { id: variant } });
         if (!vP) throw new apiBadRequestError("invalid variant")
-        console.log(vP?.price);
         price = parseFloat(vP?.price);
     } else {
         // Fallback to base price if no variant or deal is active
