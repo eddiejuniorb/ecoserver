@@ -10,7 +10,7 @@ const { prisma } = require('../../prismaClient');
 
 cartRoute.post('/add', asyncError(async (req, res) => {
 
-    const { product, variant, quantity, customise } = req.body;
+    const { product, variant, quantity, customise, moq } = req.body;
 
     // Check if product is provided
     if (!product) throw new apiBadRequestError();
